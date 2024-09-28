@@ -1,29 +1,24 @@
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import movieTrailer from "movie-trailer";
+import React, { memo, useEffect, useState } from "react";
 import YouTube from "react-youtube";
 import "./Row.css";
-import movieTrailer from "movie-trailer";
 
 function Row({ title, fetchUrl, isLargeRow }) {
   const [movies, setMovies] = useState([]); //initial value is empty array
-  const [trailerUrl, setTrailerUrl] = useState("");
+  const [trailerUrl, setTrailerUrl] = useState({id : ""});
 
   //a snippets of code which runs based on a specific condition/variables
   useEffect(() => {
     //fetch api data and load on screen
     //if [],run once when the row loads,and don't run again
-    async function fetchData() {
+    (async function fetchData() {
       const request = await axios.get(
         "https://api.themoviedb.org/3" + fetchUrl
-      ); //https://api.themoviedb.org/3//discover/movie?api_key=${API_KEY}&with_genres=99
-      // console.log(request.data.results);
+      );
       setMovies(request.data.results);
-      return request;
-    }
-    fetchData();
+    })();
   }, [fetchUrl]);
-
-  console.table(movies);
 
   //base url for image
   const baseUrl = "https://image.tmdb.org/t/p/original/";
@@ -37,18 +32,24 @@ function Row({ title, fetchUrl, isLargeRow }) {
     },
   };
 
-  const handleClick = (movie) => {
-    if (trailerUrl) {
-      setTrailerUrl("");
-    } else {
-      movieTrailer(movie?.name || "")
-        .then((url) => {
-          const urlParams = new URLSearchParams(new URL(url).search);
-          setTrailerUrl(urlParams.get("v"));
-        })
-        .catch((error) => console.log(error));
-    }
+  const handleClick = async (movie) => {
+    let res = await movieTrailer(movie?.name || movie?.title || "");
+    setTrailerUrl((prev)=>{
+      return{
+        ...prev,
+        id : ""
+      }
+    });
+    setTrailerUrl((prev)=>{
+      return{
+        ...prev,
+        id : res?.split("v=")[1]
+      }
+    });
   };
+
+  console.log(trailerUrl);
+  
 
   return (
     <div className="row">
@@ -64,14 +65,14 @@ function Row({ title, fetchUrl, isLargeRow }) {
             alt={movie.title}
             key={movie.id}
             onClick={() => handleClick(movie)}
-            className={`row_poster ${isLargeRow && "row_posterLarge"}`}
+            className={`row_poster  ${isLargeRow && "row_posterLarge"}`}
           />
         ))}
       </div>
       {/* //trailer popup */}
-      {trailerUrl && <YouTube videoId={trailerUrl} opts={opts} />}
+      {trailerUrl?.id && <YouTube videoId={trailerUrl?.id} opts={opts} />}
     </div>
   );
 }
 
-export default Row;
+export default memo(Row);

@@ -1,7 +1,7 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import requests from "./requests";
 import "./Banner.css";
+import requests from "./requests";
 
 function Banner() {
   const [movie, setmMovie] = useState([]);
@@ -23,7 +23,6 @@ function Banner() {
     fetchData();
   }, []);
 
-  console.log(movie);
 
   //image base url
   const baseUrl = "https://image.tmdb.org/t/p/original/";

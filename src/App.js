@@ -1,8 +1,8 @@
 import './App.css';
-import Row from './Row';
-import requests from './requests';
 import Banner from './Banner';
 import Navbar from './Navbar';
+import Row from './Row';
+import requests from './requests';
 
 function App() {
   return (
@@ -11,7 +11,6 @@ function App() {
           {/* Banner  */}  <Banner />
 
          <Row title="NETFLIX ORIGINALS" fetchUrl={requests.fetchActionMovies} isLargeRow={true} />
-
          <Row title="Trending Now" fetchUrl={requests.fetchTrending} />
          <Row title="Top Rated" fetchUrl={requests.fetchTopRated} />
          <Row title="Action Movies" fetchUrl={requests.fetchActionMovies} />
